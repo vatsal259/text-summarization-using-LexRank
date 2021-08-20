@@ -5,9 +5,9 @@
 Summary of a text using LexRank Algorithm
 
 Team mates:
+Vatsal Verma 19BCT0220
 Medha Tripathi 19BCE2486
 Muzzammil Hussain 19BCT0162
-Vatsal Verma 19BCT0220
 
 Report submitted for the 
 Final Project Review to Prof. Jayashree J 
