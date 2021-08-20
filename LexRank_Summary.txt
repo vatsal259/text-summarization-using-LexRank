@@ -1,0 +1,303 @@
+
+
+
+
+Summary of a text using LexRank Algorithm
+
+Team mates:
+Medha Tripathi 19BCE2486
+Muzzammil Hussain 19BCT0162
+Vatsal Verma 19BCT0220
+
+Report submitted for the 
+Final Project Review to Prof. Jayashree J 
+ 
+Course Code: CSE4022 – Natural Language Processing   
+ 
+Slot: G2 + TG2  
+Abstract
+Text summarization can be described as the process that helps to shorten long pieces of text, with the goal of producing succinct and factual content that places specific focus on the basics present in the document. This is a known issue in machine learning and natural language processing, and the amount of attention given to it has only increased over many years, keeping in mind that there are copious quantities of data online. It also has the ability to collect useful information that can be managed fairly easily by humans and could be used for a wide range of purposes, such as text assessment. In our project, we are attempting to present an automated text summary method that relies on LexRank Algorithm to find the most significant and appropriate statements in the long input text and make them a part of the short summary. 
+
+LexRank
+LexRank is an unsupervised approach to text summarization based on graph-based centrality scoring of sentences. The main idea is that sentences "recommend" other similar sentences to the reader. Thus, if one sentence is very similar to many others, it will likely be a sentence of great importance. The importance of this sentence also stems from the importance of the sentences “recommending” it. Thus, to get ranked highly and placed in a summary, a sentence must be similar to many sentences that are in turn also similar to many other sentences. This makes intuitive sense and allows the algorithms to be applied to any arbitrary new text.
+
+Introduction
+Text Summarization is a very helpful tool of Natural Language Processing which has huge impact on our day to day lives. With the on-growing digital media and ever growing publications – who on earth has the time and patience to go through all the articles / files / books to decide whether any of them are useful or not? Thankfully – the technology is already here. Have you come across mobile apps such as inshorts? It’s an innovative news app which is designed to convert news articles into a 50-60-word summary. And that is exactly what we are going to do — Text Summarization. Text Summarization is arguably one of the most challenging and captivating problems in the domain of Natural Language Processing (NLP). It’s the process of generating a brief and meaningful synopsis of text from various text sources such as books, news articles, blog posts, research papers, emails, and tweets. The demand for text summarization systems is peaking these days due to the availability of enormous amounts of textual data. 
+Our project aims to build a summarizer that helps to automatically summarize text by presenting a paragraph consisting of the most important sentences—these are the sentences that the user must read to get the main point of the text, where for many cases, reading the rest is unnecessary. 
+
+Methodology
+File upload
+The text file can be uploaded on the website in .txt, .doc, .rtf etc. The dataset whose summaries need to be generated are saved in the folder named Documents. Under this folder, the topic segregation is further performed. All the articles pertaining to a particular topic are saved under a single folder. This helps the LexRank understand that a collaborative summary needs to be generated. 
+The LexRank algorithm reads the file line by line and the generated result is showed on the different webpage. To perform the data fetch, OS walk function is used. Once the data to be summarized is fetched, the first step is the data pre-processing in which the unwanted tags and metadata are removed. Basically, in this step the data is cleaned and tokenized. This is basically preprocessing. 
+
+LexRank generation
+The LexRank algorithm takes the processed and cleaned data as an input and perform the steps mentioned in section 3.3 to obtain the sentence ranking. Firstly, the matrix is generated. This generated matrix is used to provide the cosine similarity values known as the IDF values to each word is generated which is used to generate the LexRank scores based on the centroid values and the power method. 
+All the sentences are ranked accordingly and depending on the number of sentences required in the summary set by the user, the top sentences are retrieved to form the summary. 
+
+Result
+This Text Summarizer has been created on Flask, and the languages used are Python, html and CSS. localhost:5000/upload is the local host address of the system. It also makes use of nltk and scipy.
+The Natural Language Toolkit (NLTK) is a platform used for building Python programs that work with human language data for applying in statistical natural language processing. It contains text processing libraries for tokenization, parsing, classification, stemming, tagging and semantic reasoning.
+SciPy is a scientific computation library that uses NumPy underneath. SciPy stands for Scientific Python. It provides more utility functions for optimization, stats and signal processing. It provides more utility functions for optimization, stats and signal processing. Like NumPy, SciPy is open source so we can use it freely. SciPy was created by NumPy's creator Travis Olliphant.
+
+This Text Summarizer is a system that aims to use the LexRank algorithm to locate or figure out the important and main parts of an uploaded text and to present it as a summary of the uploaded text. The output is in fact, the summary.
+
+Software Requirements:
+Python 3 or above
+Flask
+CSS
+HTML
+
+Code:
+summarizer.py
+Summarizer.py is the python file which consists of the code for summarizing the text. The code in this file has made the use of LexRank Algorithm, imports nltk and makes use of scipy to summarize the text of the uploaded file.
+
+from __future__ import print_function
+import nltk
+import networkx as nx
+import itertools
+from scipy.spatial.distance import pdist
+from scipy.spatial.distance import cosine as cosine_similarity #0 bad, 1 good
+from scipy.special import comb # n choose k
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, TfidfTransformer
+import string
+from nltk.tokenize import sent_tokenize, word_tokenize
+import pandas as pd
+#from nltk.corpus import reuters
+from sklearn.metrics.pairwise import pairwise_kernels
+
+from nltk.stem.wordnet import WordNetLemmatizer
+lemtz = WordNetLemmatizer()
+
+#def normalize_and_tokenize(text, stemmer = nltk.PorterStemmer().stem):
+def normalize_and_tokenize(text, stemmer = lemtz.lemmatize):
+    """
+    Alternateively, try the slower: 
+        stemmer = nltk.WordNetLemmatizer().lemmatize
+    Or getting really (unnecessarily!) fancy: 
+        stemmer = lambda t: nltk.PorterStemmer().stem(nltk.WordNetLemmatizer().lemmatize(t))
+    """
+    tokens = word_tokenize(text)
+    try: # py2
+        outv = [stemmer(t).translate(None, string.punctuation) for t in tokens] 
+        return outv
+    except: # py3
+        translator = str.maketrans(dict.fromkeys(string.punctuation))
+        return [stemmer(t).translate(translator) for t in tokens]
+
+
+# def fit_vectorizer(text, verbose=False, tfidf=False):
+    # if tfidf:
+        # vocab = word_tokenize(text)
+        # vocab = set(vocab)
+        # vect = TfidfVectorizer(sublinear_tf=True, max_df=0.5, analyzer='word', 
+                   # stop_words='english', vocabulary=vocab, lowercase=True)
+        # token_dict = {}
+        # for article in reuters.fileids():
+            # token_dict[article] = reuters.raw(article)
+        # for k in token_dict.keys():
+            # try:
+                # vect.fit(token_dict[k])
+            # except Exception, e:
+                # if verbose:
+                    # print k, e
+    # else:
+        # vect = CountVectorizer(tokenizer=word_tokenize, lowercase=True, preprocessor=None, stop_words='english', decode_error='ignore')
+    # return vect
+    
+def vectorize(sentences, tfidf=True, ngram_range=None):
+    if ngram_range is None:
+        ngram_range = (1,1)
+    vect = TfidfVectorizer(sublinear_tf=True, max_df=0.5, analyzer='word', 
+                   stop_words='english', lowercase=True, ngram_range=ngram_range)
+    return vect.fit_transform(sentences)
+    
+# def sparse_cosine_similarity_matrix(sp_mat):
+    # """Returns the distance matrix of an input sparse matrix using cosine distance"""
+    # n = sp_mat.shape[0]
+    # k = int(comb(n,2)) + 1 # not sure why this is off by one...
+    # dx = np.empty(k)
+    # for z, ij in enumerate(itertools.combinations(range(n),2)):
+        # i,j = ij
+        # u,v = sp_mat.getrow(i), sp_mat.getrow(j)
+        # dx[z] = cosine_similarity(u.todense(), v.todense())
+    # return 1-dx
+    
+def similarity_graph_from_term_document_matrix(sp_mat):
+    dx = pairwise_kernels(sp_mat, metric='cosine')
+    g = nx.from_numpy_matrix(dx)
+    #g.add_nodes_from(range(n)) # unconnected nodes will still affect pagerank score, but I think they'll just affect scaling and not rank order, which is all we care about.
+    return g
+    
+def summarize(text=None, term_doc_matrix=None,  n=5, tfidf=False, ngram_range=None, verbose=False):
+    """
+    Given an input document, extracts and returns representative sentences.
+    At present, returns top n sentences, but I hope to find an unsupervised 
+    heuristic to determine an appropriate n.
+    """
+    if term_doc_matrix is None:
+        if verbose: print("Reading document...")
+        sentences = sent_tokenize(text)
+        if verbose: print("Fitting vectorizer...")
+        term_doc_matrix = vectorize(sentences, tfidf=tfidf, ngram_range=ngram_range)
+    if verbose: print("Building similarity graph...")
+    g = similarity_graph_from_term_document_matrix(term_doc_matrix)
+    if verbose: print("Calculating sentence pagerank (lexrank)...")
+    scores = pd.Series(nx.pagerank(g, weight='weight'))
+    #scores.sort(ascending=False)
+    scores.sort_values(ascending=False, inplace=True)
+    ix = pd.Series(scores.index[:n])
+    #ix.sort()
+    ix.sort_values(inplace=True)
+    summary = [sentences[i] for i in ix]
+    return {'summary':summary}
+
+app.py
+app.py is the flask file which has the code for the web application.
+from flask import Flask, render_template, request
+from werkzeug.utils import secure_filename
+from summarizer import summarize
+import nltk
+
+app = Flask(__name__)
+
+@app.route('/upload')
+def index():
+   return render_template('upload.html') 
+    
+@app.route('/uploader', methods = ['GET', 'POST'])
+def uploads_file():
+    if request.method == 'POST':
+        f = request.files['file']
+        filepath=secure_filename(f.filename)
+        f.save(filepath)
+        with open(filepath,'r') as w:
+            text=w.read()
+        test=summarize(text)
+        test=test['summary']
+        str = ""
+        for ele in test: 
+            str += ele 
+        return render_template('summary.html',result=str)
+
+if __name__ == '__main__':
+    app.run(debug = True)
+
+upload.html
+The upload page of website.
+<!Doctype html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <meta name="keywords" content="HTML,CSS,XML,JavaScript">
+      <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='Beauty.css') }}">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Summerizer</title>
+   </head>
+   <body>
+      <div class="head">
+         <img src="static/Frame 16 (1).png" alt="NLP">
+         <h1>Text Summarizer using Lexrank Algorithm </h1>
+      </div>
+      <form action = "http://localhost:5000/uploader" method = "POST" enctype = "multipart/form-data">
+         <input id="file" type = "file" name = "file"/>
+         <input class="sub" type = "submit"/>
+      </form>
+   </body>
+</html>
+
+summary.html
+The webpage that shows the summary of the uploaded file.
+<!Doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="keywords" content="HTML,CSS,XML,JavaScript">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='Beauty.css') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Summerizer</title>
+    </head>
+    <body>
+        <span>
+            <img src="static/Frame 16 (1).png" alt="NLP">
+        </span>
+        <span class="head">
+            <h1 class="sumhead">Summary of the uploaded file</h1>
+        </span>
+         </body>
+        <p>{{result}}</p>
+    </body>
+</html>
+
+beauty.css
+The css file of the webpages.
+body{
+    margin: 0px;
+    background-color: #F2F4F9;
+}
+img{
+    height: 250px;
+    width: 100%;
+    margin: 0 !important;
+}
+p{
+    text-align: left;
+    font-size: 30px;
+    margin-left: 4%;
+    margin-right: 4%;
+}
+.head{
+    margin-top: 0px !important;
+    background-color: rgb(3, 221, 148);
+}
+h1{
+    margin-top: 0px;
+    font-size: 60px;
+    color: #17005D;
+    text-align: center;
+    font-family: 'roboto';
+}
+#file{
+    font-family: 'roboto';
+    font-size: 20px;
+    color: #FE2CBB;
+    text-align: center;
+    margin-left: 43%;
+}
+.sub{
+    width: 120px;
+    height: 45px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 25px;
+    color: #FE2CBB;
+    background-color: #17005D;
+    margin-top: 2%;
+    margin-left: 47%;
+}
+.sumhead{
+    margin-top: 10px;
+}
+
+
+
+
+
+
+
+Results:
+The uploaded file.
+
+
+
+
+
+References
+Chuang, W., & Yang, J. (2000). Extracting sentence segments for text summarization. Proceedings Of The 23Rd Annual International ACM SIGIR Conference On Research And Development In Information Retrieval - SIGIR '00. https://doi.org/10.1145/345508.345566
+Gupta, H., & Patel, M. (2020). Study of Extractive Text Summarizer Using The Elmo Embedding. 2020 Fourth International Conference On I-SMAC (Iot In Social, Mobile, Analytics And Cloud) (I-SMAC). https://doi.org/10.1109/i-smac49090.2020.9243610
+Hingu, D., Shah, D., & Udmale, S. (2015). Automatic text summarization of Wikipedia articles. 2015 International Conference On Communication, Information & Computing Technology (ICCICT). https://doi.org/10.1109/iccict.2015.7045732
+Krishnaveni, P., & Balasundaram, S. (2017). Automatic text summarization by local scoring and ranking for improving coherence. 2017 International Conference On Computing Methodologies And Communication (ICCMC). https://doi.org/10.1109/iccmc.2017.8282539
+Menaka, R., Thaker, J., Bhushan, R., & Karthik, R. (2020). IMEXT Text Summarizer Using Deep Learning. Applied Computer Vision And Image Processing, 34-45. https://doi.org/10.1007/978-981-15-4029-5_4
+G. M. R. N. Jan Ulrich Giuseppe Carenini, "RegressionBased Summarization of Email Conversations," in 3rd Int'l AAAI Conference on Weblogs and Social Media (ICWSM-09). San Jose, CA: AAAI, 2009.
+https://www.jair.org/index.php/jair/article/view/10396
+Takamura, Hiroya, and Manabu Okumura. "Text summarization model based on maximum coverage problem and its variant." In Proceedings of the 12th Conference of the European Chapter of the ACL (EACL 2009), pp. 781-789. 2009. 

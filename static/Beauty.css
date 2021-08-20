@@ -1,0 +1,48 @@
+body{
+    margin: 0px;
+    background-color: #F2F4F9;
+}
+img{
+    height: 250px;
+    width: 100%;
+    margin: 0 !important;
+}
+p{
+    text-align: left;
+    font-size: 30px;
+    margin-left: 4%;
+    margin-right: 4%;
+}
+.head{
+    margin-top: 0px !important;
+    background-color: rgb(3, 221, 148);
+}
+h1{
+    margin-top: 0px;
+    font-size: 60px;
+    color: #17005D;
+    text-align: center;
+    font-family: 'roboto';
+}
+#file{
+    font-family: 'roboto';
+    font-size: 20px;
+    color: #FE2CBB;
+    text-align: center;
+    margin-left: 43%;
+}
+.sub{
+    width: 120px;
+    height: 45px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 25px;
+    color: #FE2CBB;
+    background-color: #17005D;
+    margin-top: 2%;
+    margin-left: 47%;
+}
+.sumhead{
+    margin-top: 10px;
+}
